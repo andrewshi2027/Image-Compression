@@ -8,7 +8,7 @@ Image *load_image(char *filename) {
     Image *image = (Image *)malloc(sizeof(Image));
     unsigned int width, height, max_intensity;
 
-    //**Open the PPM file for reading. If the file can't be opened, then return NULL**
+    //**Open the PPM file for reading**
     FILE *file = fopen(filename, "r");
     if (!file) {
         free(image);
@@ -42,8 +42,8 @@ Image *load_image(char *filename) {
         }
     }
 
-    //**Read the image width, height and max intensity**
-    fscanf(file, "%u, %u", &height, &max_intensity); //read unsigned short values
+    //**Read the height and max intensity**
+    fscanf(file, "%u, %u", &height, &max_intensity);
 
     //only handle max intensity of 255
     if (max_intensity != 255) {
