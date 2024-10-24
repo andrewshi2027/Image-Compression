@@ -12,9 +12,10 @@
 // } Image;
 
 typedef struct {
-    unsigned short width; //width of image in pixels
-    unsigned short length; //length of image in pixels
-    unsigned char* data; //1D array to hold pixel intensities
+    char header[3]; 
+    unsigned int width; //width of image in pixels
+    unsigned int height; //height of image in pixels
+    int* pixels; //1D array to hold pixel intensities
 } Image;
 
 
