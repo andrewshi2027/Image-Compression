@@ -18,7 +18,7 @@ Image *load_image(char *filename) {
     //**Read the PPM file header**
     char format[3];
     fscanf(file, "%s", format);
-    format[2] = '\n';
+    format[2] = '\0';
     //not a P3 PPM file
     if (strcmp(format, "P3") != 0) {
         fclose(file); //close the file
