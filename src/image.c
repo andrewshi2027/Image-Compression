@@ -29,13 +29,13 @@ Image *load_image(char *filename) {
     //**Skip over any comments in the file header**
     while (1) {
         unsigned int x;
-        //if is an integer
+        //if scanned value is an integer
         if (fscanf(file, "%u", &x) == 1) {
             image->width = x;
             width = x;
             break;
         }
-        //if is NOT an integer
+        //if scanned value  is NOT an integer
         else {
             char ch;
             fscanf(file, "%c", &ch);
@@ -52,9 +52,9 @@ Image *load_image(char *filename) {
     }
 
     //**Read pixel data from the file**
-    int* pixels = (int*)malloc(width * height * sizeof(int));
+    int* pixels = (int*)malloc(width * height * 3 * sizeof(int));
 
-    for (unsigned int i = 0; i < width * height; i++) {
+    for (unsigned int i = 0; i < width * height * 3; i++) {
         fscanf(file, "%d", &pixels[i]);
     }
 
