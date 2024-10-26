@@ -93,10 +93,11 @@ unsigned short get_image_height(Image *image) {
 }
 
 unsigned char get_image_intensity(Image *image, unsigned int row, unsigned int col) {
-    (void)image;
-    (void)row;
-    (void)col;
-    return 0;
+    return (unsigned char) image->pixels[row][col * 3];
+    // (void)image;
+    // (void)row;
+    // (void)col;
+    // return 0;
 }
 
 unsigned int hide_message(char *message, char *input_filename, char *output_filename) {
