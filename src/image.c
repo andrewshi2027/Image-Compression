@@ -10,21 +10,21 @@ Image *load_image(char *filename) {
 
     //**Open the PPM file for reading**
     FILE *file = fopen(filename, "r");
-    // if (!file) {
-    //     free(image);
-    //     return NULL; //failed to open file
-    // }
+    if (!file) {
+        free(image);
+        return NULL; //failed to open file
+    }
 
     //**Read the PPM file header**
     char format[3];
     fscanf(file, "%s", format);
     format[2] = '\0';
     //not a P3 PPM file
-    // if (strcmp(format, "P3") != 0) {
-    //     fclose(file); //close the file
-    //     free(image);
-    //     return NULL; 
-    // }
+    if (strcmp(format, "P3") != 0) {
+        fclose(file); //close the file
+        free(image);
+        return NULL; 
+    }
 
     //**Skip over any comments in the file header**
     while (1) {
@@ -46,10 +46,10 @@ Image *load_image(char *filename) {
     fscanf(file, "%u %u", &height, &max_intensity);
 
     //only handle max intensity of 255
-    // if (max_intensity != 255) {
-    //     fclose(file); //close file
-    //     return NULL; 
-    // }
+    if (max_intensity != 255) {
+        fclose(file); //close file
+        return NULL; 
+    }
 
     //**Read pixel data from the file**
     int** pixels = (int**)malloc(width * height * 3 * sizeof(int*));
@@ -99,8 +99,7 @@ unsigned short get_image_height(Image *image) {
 }
 
 unsigned char get_image_intensity(Image *image, unsigned int row, unsigned int col) {
-    //return (unsigned char) image->pixels[row][col * 3];
-    return image->pixels[row][col * 3];
+    return (unsigned char) image->pixels[row][col * 3];
     // (void)image;
     // (void)row;
     // (void)col;
