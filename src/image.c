@@ -76,7 +76,13 @@ Image *load_image(char *filename) {
 }
 
 void delete_image(Image *image) {
-    free(image);
+    if (image) {
+        for (unsigned int i = 0; i < image->height; i++) {
+            free(image->pixels[i]); //free each row
+        }
+        free(image->pixels); //free the pixel array itself
+        free(image); 
+    }
     //(void)image;
 }
 
