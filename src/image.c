@@ -38,12 +38,12 @@ Image *load_image(char *filename) {
         //if scanned value  is NOT an integer
         else {
             char ch;
-            fscanf(file, "%c", &ch);
+            fscanf(file, "%s", &ch);
         }
     }
 
     //**Read the height and max intensity**
-    fscanf(file, "%u, %u", &height, &max_intensity);
+    fscanf(file, "%u %u", &height, &max_intensity);
 
     //only handle max intensity of 255
     if (max_intensity != 255) {
@@ -52,17 +52,18 @@ Image *load_image(char *filename) {
     }
 
     //**Read pixel data from the file**
-    int** pixels = (int**)malloc(width * height * 3 * sizeof(int));
+    int** pixels = (int**)malloc(width * height * 3 * sizeof(int*));
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width * 3; j++) {
+    for (unsigned int i = 0; i < height; i++) {
+        pixels[i] = malloc(width *3 * sizeof(int));
+        for (unsigned int j = 0; j < width * 3; j++) {
             fscanf(file, "%d", &pixels[i][j]);
         }
     }
 
     image->header[0] = format[0]; 
     image->header[1] = format[1]; 
-    image->width = width;
+    // image->width = width;
     image->height = height;
     image->pixels = pixels;
 
@@ -74,9 +75,9 @@ Image *load_image(char *filename) {
 }
 
 void delete_image(Image *image) {
-    if (image) {
-        free(image);
-    }
+    
+    
+    free(image);
     //(void)image;
 }
 
