@@ -52,10 +52,12 @@ Image *load_image(char *filename) {
     }
 
     //**Read pixel data from the file**
-    int* pixels = (int*)malloc(width * height * 3 * sizeof(int));
+    int** pixels = (int**)malloc(width * height * 3 * sizeof(int));
 
-    for (unsigned int i = 0; i < width * height * 3; i++) {
-        fscanf(file, "%d", &pixels[i]);
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width * 3; j++) {
+            fscanf(file, "%d", &pixels[i][j]);
+        }
     }
 
     image->header[0] = format[0]; 

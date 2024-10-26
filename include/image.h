@@ -15,7 +15,8 @@ typedef struct {
     char header[3]; 
     unsigned int width; //width of image in pixels
     unsigned int height; //height of image in pixels
-    int* pixels; //1D array to hold pixel intensities
+    unsigned int max_intensity; 
+    int** pixels; //2D array to hold pixel intensities
 } Image;
 
 
