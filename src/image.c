@@ -38,7 +38,7 @@ Image *load_image(char *filename) {
         //if scanned value  is NOT an integer
         else {
             char ch;
-            fscanf(file, "%s", &ch);
+            fscanf(file, "%c", &ch);
         }
     }
 
@@ -63,10 +63,11 @@ Image *load_image(char *filename) {
 
     image->header[0] = format[0]; 
     image->header[1] = format[1]; 
-    // image->width = width;
     image->height = height;
+    image->max_intensity = 255;
     image->pixels = pixels;
 
+    //Close the file
     fclose(file);
     return image;
 
@@ -75,8 +76,6 @@ Image *load_image(char *filename) {
 }
 
 void delete_image(Image *image) {
-    
-    
     free(image);
     //(void)image;
 }
