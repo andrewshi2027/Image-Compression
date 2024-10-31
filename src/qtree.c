@@ -1,5 +1,14 @@
 #include "qtree.h"
 
+double calculate_rmse (int** pixels, int x, int y, int width, int length, unsigned char average) {
+    double error = 0.0;
+    int pixel_count = width * length;
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; i < width * 3;)
+    }
+}
+
 QTNode *create_quadtree(Image *image, double max_rmse) {
     int width = image->width;
     int height = image->height;
