@@ -48,19 +48,13 @@ QTNode *create_quadtree(Image *image, double max_rmse) {
             //node->child1;
             //node->child3;
         }
+        else {
+            //node->child1;
+            //node->child2;
+            //node->child3;
+            //node->child4;
+        }
     }
-
-    //If RMSE > max_rmse, split the node and create 4 children
-    //int half_width = width / 2;
-    //int half_height = height / 2;
-
-    //Special Cases
-
-    
-    //Case 2: Single Column of Pixels
-
-
-
 
 
     (void)image;
