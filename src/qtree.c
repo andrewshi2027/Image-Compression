@@ -1,10 +1,10 @@
 #include "qtree.h"
 #include <math.h>
 
-double calculate_rmse (int** pixels, int width, int height) {
-    double intensity_sum, average, squared_difference = 0.0;
+double calculate_average(int** pixels, int width, int height) {
+    double intensity_sum, average = 0.0;
     int pixel_count = width * height;
-    
+
     //Calculate sum of intensities
     for (int i = 0; i < height; i++) {
         for (int j = 0; i < width; j++)
@@ -13,6 +13,14 @@ double calculate_rmse (int** pixels, int width, int height) {
 
     //Average of intensities
     average = intensity_sum / pixel_count;
+
+    return average;
+}
+double calculate_rmse(int** pixels, int width, int height) {
+    double intensity_sum, average, squared_difference = 0.0;
+    int pixel_count = width * height;
+    
+    average = calculate_average(pixels, width, height);
 
     //Difference of average with each pixel
     for (int i = 0; i < height; i++) {
@@ -37,6 +45,9 @@ QTNode *create_quadtree(Image *image, double max_rmse) {
     //Calculate RMSE
     double rmse = calculate_rmse(image->pixels, width, height);
 
+    //Intensity 
+    node->intensity = calculate_average(image->pixels, width, height);
+
     if (rmse > max_rmse) {
         //Case 1: Single Row of Pixels, children 3 and 4 are NULL
         if (height == 1) {
@@ -55,7 +66,6 @@ QTNode *create_quadtree(Image *image, double max_rmse) {
             //node->child4;
         }
     }
-
 
     (void)image;
     (void)max_rmse;
@@ -87,9 +97,9 @@ QTNode *get_child4(QTNode *node) {
 }
 
 unsigned char get_node_intensity(QTNode *node) {
-    //return node->intensity;
-    (void)node;
-    return 0;
+    return node->intensity;
+    // (void)node;
+    // return 0;
 }
 
 void delete_quadtree(QTNode *root) {
