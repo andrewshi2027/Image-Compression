@@ -18,7 +18,7 @@ double calculate_average(int** pixels, int width, int height) {
 }
 
 double calculate_rmse(int** pixels, int width, int height) {
-    double intensity_sum, average, squared_difference = 0.0;
+    double average, squared_difference = 0.0;
     int pixel_count = width * height;
     
     average = calculate_average(pixels, width, height);
@@ -67,6 +67,7 @@ QTNode *quadtree_helper(Image *image, double max_rmse, int row_start, int row_en
             node->child1 = quadtree_helper(image, max_rmse, row_start, (row_start + height) / 2, column_start, column_end);
             node->child3 = quadtree_helper(image, max_rmse, (row_start + height) / 2, row_end, column_start, column_end);
         }
+        //Case 3: General case, split into 4 quadrants
         else {
             node->child1 = quadtree_helper(image, max_rmse, row_start, (row_start + height) / 2, column_start, (column_start + width) / 2);
             node->child2 = quadtree_helper(image, max_rmse, row_start, (row_start + height) / 2, (column_start + width) / 2, column_end);
@@ -82,51 +83,7 @@ QTNode *create_quadtree(Image *image, double max_rmse) {
     int width = image->width;
     int height = image->height;
 
-    //Create a new QTNode
-    QTNode *node = (QTNode *)malloc(sizeof(QTNode));
-    if (!node) {
-        return NULL;
-    }
-
-    //Set children to NULL
-    node->child1 = NULL;
-    node->child2 = NULL;
-    node->child3 = NULL;
-    node->child4 = NULL;
-
-    //Calculate RMSE
-    double rmse = calculate_rmse(image->pixels, width, height);
-
-    //Intensity 
-    node->intensity = (unsigned char)calculate_average(image->pixels, width, height);
-
-    node->row_start = 0;
-    node->column_start = 0;
-    node->row_end = height;
-    node->column_end = width;
-
-    //Split Node and Create Four Children
-    if (rmse > max_rmse) {
-        //Case 1: Single Row of Pixels, children 3 and 4 are NULL
-        if (height == 1) {
-            node->child1 = quadtree_helper(image, max_rmse, 0, 1, 0, width / 2);
-            node->child2 = quadtree_helper(image, max_rmse, 0, 1, width / 2 , width);
-
-        }
-        //Case 2: Single Column of Pixels, children 2 and 4 are NULL
-        else if (width == 1) {
-            node->child1 = quadtree_helper(image, max_rmse, 0, height / 2, 0, 1);
-            node->child3 = quadtree_helper(image, max_rmse, height / 2, height, 0, 1);
-        }
-        else {
-            node->child1 = quadtree_helper(image, max_rmse, 0, height / 2, 0, width / 2);
-            node->child2 = quadtree_helper(image, max_rmse, 0, height / 2, width / 2, width);
-            node->child3 = quadtree_helper(image, max_rmse, height / 2, height, 0, width / 2);
-            node->child4 = quadtree_helper(image, max_rmse, height / 2, height, width / 2, width);
-        }
-    }
-
-    return node;
+    return quadtree_helper(image, max_rmse, 0, height, 0, width);
     // (void)image;
     // (void)max_rmse;
     // return NULL;

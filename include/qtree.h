@@ -13,7 +13,7 @@
 //     char placeholder[1];  // This is a placeholder. You should not use this struct.    
 // } QTNode;
 
-typedef struct {
+typedef struct QTNode{
     unsigned char intensity;
     int row_start;
     int column_start;
