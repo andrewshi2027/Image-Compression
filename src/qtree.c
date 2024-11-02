@@ -74,15 +74,11 @@ QTNode *quadtree_helper(Image *image, double max_rmse, int row_start, int row_en
         if (height == 1) {
             node->child1 = quadtree_helper(image, max_rmse, row_start, row_end, column_start, column_mid);
             node->child2 = quadtree_helper(image, max_rmse, row_start, row_end, column_mid , column_end);
-            node->child3 = NULL;
-            node->child4 = NULL;
         }
         //Case 2: Single Column of Pixels, children 2 and 4 are NULL
         else if (width == 1) {
             node->child1 = quadtree_helper(image, max_rmse, row_start, row_mid, column_start, column_end);
             node->child3 = quadtree_helper(image, max_rmse, row_mid, row_end, column_start, column_end);
-            node->child2 = NULL;
-            node->child4 = NULL;
         }
         //Case 3: Split into 4 Quadrants
         else {
