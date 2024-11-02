@@ -246,6 +246,10 @@ QTNode *load_preorder_helper(FILE *fp) {
 QTNode *load_preorder_qt(char *filename) {
     FILE *fp = fopen(filename, "r");
 
+    if(!fp) {
+        return NULL;
+    }
+
     QTNode *node = load_preorder_helper(fp);
 
     fclose(fp);
