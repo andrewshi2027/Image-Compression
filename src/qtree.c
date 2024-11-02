@@ -59,7 +59,8 @@ QTNode *quadtree_helper(Image *image, double max_rmse, int row_start, int row_en
     int height = row_end - row_start;
 
     //Intensity  
-    node->intensity = (unsigned char)calculate_average(image->pixels, row_start, row_end, column_start, column_end);
+    double average_intensity = calculate_average(image->pixels, row_start, row_end, column_start, column_end);
+    node->intensity = (unsigned char)average_intensity;
 
     //RMSE
     double rmse = calculate_rmse(image->pixels, row_start, row_end, column_start, column_end, node->intensity);
@@ -146,9 +147,43 @@ void delete_quadtree(QTNode *root) {
     //(void)root;
 }
 
+
+void save_ppm_helper (QTNode *root, int** pixels) {
+    if(!root) {
+        return;
+    }
+
+    if(!root->child1 && !root->child2 && !root->child3 && !root->child4) {
+        for (int i = root->column_start; i < root->column_end; i++) {
+            for (int j = root->row_start; j < root->row_end; j++) {
+                pixels[i][j] = root->intensity;
+            }
+        }
+    }
+
+    else {
+        save_ppm_helper(root->child1, pixels);
+        save_ppm_helper(root->child2, pixels);
+        save_ppm_helper(root->child3, pixels);
+        save_ppm_helper(root->child4, pixels);
+    }
+}
+
+//Traverses the quadtree rooted at root and saves an image in PPM format using the fields stored in each quadtree node
 void save_qtree_as_ppm(QTNode *root, char *filename) {
-    (void)root;
-    (void)filename;
+    FILE *fp = fopen(filename, "w");
+    if(!fp) {
+        return;
+    }
+
+    int width = root->column_end - root->column_start;
+    int height = root->row_end -root->row_start;
+
+    fprintf(fp, "P3\n%u %u\n255\n", width, height);
+
+
+    // (void)root;
+    // (void)filename;
 }
 
 QTNode *load_preorder_qt(char *filename) {
