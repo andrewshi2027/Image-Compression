@@ -2,10 +2,10 @@
 #include <math.h>
 
 double calculate_average(int** pixels, int row_start, int row_end, int column_start, int column_end) {
+
+    //Variables
     double intensity_sum, average = 0.0;
-    double width = column_end - column_start;
-    double height = row_end - row_start;
-    double pixel_count = width * height;
+    double pixel_count = (column_end - column_start) * (row_end - row_start);
 
     //Calculate sum of intensities
     for (int i = row_start; i < row_end; i++) {
@@ -20,15 +20,14 @@ double calculate_average(int** pixels, int row_start, int row_end, int column_st
 }
 
 double calculate_rmse(int** pixels, int row_start, int row_end, int column_start, int column_end, double average) {
-    double squared_difference = 0.0;
-    double width = column_end - column_start;
-    double height = row_end - row_start;
-    int pixel_count = width * height;
-    
 
+    //Variables
+    double squared_difference = 0.0;
+    double pixel_count = (column_end - column_start) * (row_end - row_start);
+    
     //Difference of average with each pixel
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    for (int i = row_start; i < row_end; i++) {
+        for (int j = column_start; j < column_end; j++) {
             squared_difference += (average - pixels[i][j]) * (average - pixels[i][j]);
         } 
     }
@@ -49,33 +48,36 @@ QTNode *quadtree_helper(Image *image, double max_rmse, int row_start, int row_en
     node->column_start = column_start;
     node->column_end = column_end;
 
+    int width = column_end - column_start;
+    int height = row_end - row_start;
+
     //Intensity  
     node->intensity = (unsigned char)calculate_average(image->pixels, row_start, row_end, column_start, column_end);
 
     //RMSE
     double rmse = calculate_rmse(image->pixels, row_start, row_end, column_start, column_end, node->intensity);
 
-    int width = column_end - column_start;
-    int height = row_end - row_start;
-
     //Split Node
     if (rmse > max_rmse) {
+        int row_mid = (row_start + height) / 2;
+        int column_mid = (column_start + width) / 2;
+
         //Case 1: Single Row of Pixels, children 3 and 4 are NULL
         if (height == 1) {
-            node->child1 = quadtree_helper(image, max_rmse, row_start, row_end, column_start, (column_start + width) / 2);
-            node->child2 = quadtree_helper(image, max_rmse, row_start, row_end, (column_start + width) / 2 , column_end);
+            node->child1 = quadtree_helper(image, max_rmse, row_start, row_end, column_start, column_mid);
+            node->child2 = quadtree_helper(image, max_rmse, row_start, row_end, column_mid , column_end);
         }
         //Case 2: Single Column of Pixels, children 2 and 4 are NULL
         else if (width == 1) {
-            node->child1 = quadtree_helper(image, max_rmse, row_start, (row_start + height) / 2, column_start, column_end);
-            node->child3 = quadtree_helper(image, max_rmse, (row_start + height) / 2, row_end, column_start, column_end);
+            node->child1 = quadtree_helper(image, max_rmse, row_start, row_mid, column_start, column_end);
+            node->child3 = quadtree_helper(image, max_rmse, row_mid, row_end, column_start, column_end);
         }
         //Case 3: Split into 4 Quadrants
         else {
-            node->child1 = quadtree_helper(image, max_rmse, row_start, (row_start + height) / 2, column_start, (column_start + width) / 2);
-            node->child2 = quadtree_helper(image, max_rmse, row_start, (row_start + height) / 2, (column_start + width) / 2, column_end);
-            node->child3 = quadtree_helper(image, max_rmse, (row_start + height) / 2, row_end, column_start, (column_start + width) / 2);
-            node->child4 = quadtree_helper(image, max_rmse, (row_start + height) / 2, row_end, (column_start + width) / 2, column_end);
+            node->child1 = quadtree_helper(image, max_rmse, row_start, row_mid, column_start, column_mid);
+            node->child2 = quadtree_helper(image, max_rmse, row_start, row_mid, column_mid, column_end);
+            node->child3 = quadtree_helper(image, max_rmse, row_mid, row_end, column_start, column_mid);
+            node->child4 = quadtree_helper(image, max_rmse, row_mid, row_end, column_mid, column_end);
         }
     }
     return node;
