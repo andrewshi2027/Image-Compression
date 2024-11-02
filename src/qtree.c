@@ -204,7 +204,7 @@ QTNode *load_preorder_helper(FILE *fp) {
     int average_intensity, row_start, column_start, width, height;
 
     //Read Data
-    fscanf(fp, "%c %d %d %d %d %d\n", &node_type, &average_intensity, &row_start, &width, &column_start, &height);
+    fscanf(fp, "%c %d %d %d %d %d\n", &node_type, &average_intensity, &row_start, &height, &column_start, &width);
 
     //Initialize and assign values to node
     QTNode *node = (QTNode *)malloc(sizeof(QTNode));
