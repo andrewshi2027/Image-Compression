@@ -240,7 +240,6 @@ QTNode *load_preorder_helper(FILE *fp) {
             node->child4 = load_preorder_helper(fp);
         }
     }
-    fclose(fp);
     return node;
 }
 
