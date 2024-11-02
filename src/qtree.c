@@ -144,25 +144,26 @@ void delete_quadtree(QTNode *root) {
 }
 
 
-void save_ppm_helper (QTNode *root, int** pixels) {
+void save_ppm_helper (QTNode *root, int width, int height, int pixels[height][width]) {
     if(!root) {
         return;
     }
 
+    //Case 1: Leaf Node, no children
     if(!root->child1 && !root->child2 && !root->child3 && !root->child4) {
         for (int i = root->column_start; i < root->column_end; i++) {
             for (int j = root->row_start; j < root->row_end; j++) {
                 pixels[i][j] = root->intensity;
             }
         }
+        return;
     }
 
-    else {
-        save_ppm_helper(root->child1, pixels);
-        save_ppm_helper(root->child2, pixels);
-        save_ppm_helper(root->child3, pixels);
-        save_ppm_helper(root->child4, pixels);
-    }
+    //Case 2: Internal Node, continue recursion on each child
+    save_ppm_helper(root->child1, width, height, pixels);
+    save_ppm_helper(root->child2, width, height, pixels);
+    save_ppm_helper(root->child3, width, height, pixels);
+    save_ppm_helper(root->child4, width, height, pixels);
 }
 
 //Traverses the quadtree rooted at root and saves an image in PPM format using the fields stored in each quadtree node
@@ -175,9 +176,26 @@ void save_qtree_as_ppm(QTNode *root, char *filename) {
     int width = root->column_end - root->column_start;
     int height = root->row_end -root->row_start;
 
-    fprintf(fp, "P3\n%u %u\n255\n", width, height);
+    //Write PPM File Header
+    fprintf(fp, "P3\n");
 
+    //Write Width, Height and Maximum Intensity
+    fprintf(fp, "%d %d\n%d\n", width, height, 255);
 
+    //Initialize array based on the type of node
+    int pixels[height][width];
+    
+    //Populate pixels array
+    save_ppm_helper(root, height, width, pixels);
+
+    //Write RGB to PPM File
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            fprintf(fp, "%d %d %d ", pixels[i][j], pixels[i][j], pixels[i][j]);
+        }
+    }
+
+    fclose(fp);
     // (void)root;
     // (void)filename;
 }
