@@ -181,11 +181,9 @@ void save_qtree_as_ppm(QTNode *root, char *filename) {
 
     //Write Width, Height and Maximum Intensity
     fprintf(fp, "%d %d\n%d\n", width, height, 255);
-
-    //Initialize array based on the type of node
-    int pixels[height][width];
     
     //Populate pixels array
+    int pixels[height][width];
     save_ppm_helper(root, height, width, pixels);
 
     //Write RGB to PPM File
@@ -200,11 +198,64 @@ void save_qtree_as_ppm(QTNode *root, char *filename) {
     // (void)filename;
 }
 
-QTNode *load_preorder_qt(char *filename) {
-    (void)filename;
-    return NULL;
+QTNode *load_preorder_helper(FILE *fp) {
+    //Variables
+    char node_type;
+    int intensity, row_start, column_start, width, height;
+
+    //Read Data
+    fscanf(fp, "%c %d %d %d %d %d\n", &node_type, &intensity, &row_start, &width, &column_start, &height);
+
+    //Initialize and assign values to node
+    QTNode *node = (QTNode *)malloc(sizeof(QTNode));
+    node->intensity = (unsigned char) intensity;
+    node->row_start = row_start;
+    node->column_start = column_start;
+    node->row_end = row_start + height;
+    node->column_start = column_start + width;
+
+    //Set Children to NULL
+    node->child1 = NULL;
+    node->child2 = NULL;
+    node->child3 = NULL;
+    node->child4 = NULL;
+
+    //If node is an internal node
+    if (node_type == 'N') {
+        //Case 1: Single Row of Pixels, children 3 and 4 are NULL
+        if(width == 1) {
+            node->child1 = load_preorder_helper(fp);
+            node->child3 = load_preorder_helper(fp);
+        }
+        //Case 2: Single Column of Pixels, children 2 and 4 are NULL
+        else if(height == 1) {
+            node->child1 = load_preorder_helper(fp);
+            node->child2 = load_preorder_helper(fp);
+        }
+        //Case 3: Split into 4 Quadrants
+        else {
+            node->child1 = load_preorder_helper(fp);
+            node->child2 = load_preorder_helper(fp);
+            node->child3 = load_preorder_helper(fp);
+            node->child4 = load_preorder_helper(fp);
+        }
+    }
+    fclose(fp);
+    return node;
 }
 
+QTNode *load_preorder_qt(char *filename) {
+    FILE *fp = fopen(filename, "r");
+
+    QTNode *node = load_preorder_helper(fp);
+
+    fclose(fp);
+    return node;
+    // (void)filename;
+    // return NULL;
+}
+
+//Saves the preorder traversal of the quadtree rooted at root using the preorder traversal encoding scheme described above.
 void save_preorder_qt(QTNode *root, char *filename) {
     (void)root;
     (void)filename;
