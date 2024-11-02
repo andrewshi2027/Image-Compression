@@ -15,7 +15,10 @@
 
 typedef struct {
     unsigned char intensity;
-    //row, column, width and height? 
+    int row_start;
+    int column_start;
+    int row_end;
+    int column_end;
     struct QTNode *child1;
     struct QTNode *child2;
     struct QTNode *child3;

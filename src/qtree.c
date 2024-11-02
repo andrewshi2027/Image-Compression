@@ -16,6 +16,7 @@ double calculate_average(int** pixels, int width, int height) {
 
     return average;
 }
+
 double calculate_rmse(int** pixels, int width, int height) {
     double intensity_sum, average, squared_difference = 0.0;
     int pixel_count = width * height;
@@ -32,8 +33,18 @@ double calculate_rmse(int** pixels, int width, int height) {
     return sqrt(squared_difference / pixel_count);
 }
 
+QTNode quadtree_helper(Image *image, double max_rmse, int width, int height) {
+    QTNode *node = (QTNode *)malloc(sizeof(QTNode));
+
+    //Intensity 
+    node->intensity = (unsigned char)calculate_average(image->pixels, width, height);
+
+}
+
+
 QTNode *create_quadtree(Image *image, double max_rmse) {
-    int width = image->width; 
+
+    int width = image->width;
     int height = image->height;
 
     //Create a new QTNode
@@ -42,12 +53,24 @@ QTNode *create_quadtree(Image *image, double max_rmse) {
         return NULL;
     }
 
+    //Set children to NULL
+    node->child1 = NULL;
+    node->child2 = NULL;
+    node->child3 = NULL;
+    node->child4 = NULL;
+
     //Calculate RMSE
     double rmse = calculate_rmse(image->pixels, width, height);
 
     //Intensity 
     node->intensity = calculate_average(image->pixels, width, height);
 
+    node->row_start = 0;
+    node->column_start = 0;
+    node->row_end = height;
+    node->column_end = width;
+
+    //Split Node and Create Four Children
     if (rmse > max_rmse) {
         //Case 1: Single Row of Pixels, children 3 and 4 are NULL
         if (height == 1) {
