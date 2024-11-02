@@ -52,12 +52,16 @@ Image *load_image(char *filename) {
     }
 
     //**Read pixel data from the file**
-    int** pixels = (int**)malloc(width * height * 3 * sizeof(int*));
+    int** pixels = (int**)malloc(width * height * sizeof(int*));
 
     for (unsigned int i = 0; i < height; i++) {
-        pixels[i] = malloc(width *3 * sizeof(int));
-        for (unsigned int j = 0; j < width * 3; j++) {
-            fscanf(file, "%d", &pixels[i][j]);
+        int r, g, b;
+        pixels[i] = malloc(width * sizeof(int));
+        for (unsigned int j = 0; j < width; j++) {
+            fscanf(file, "%d %d %d", &r, &g, &b);
+            pixels[i][j] = r;
+            //read the first two and assign to garbage
+            //read every third element and store it to 2D array (pixels[i][j])
         }
     }
 
@@ -99,7 +103,7 @@ unsigned short get_image_height(Image *image) {
 }
 
 unsigned char get_image_intensity(Image *image, unsigned int row, unsigned int col) {
-    return (unsigned char) image->pixels[row][col * 3];
+    return (unsigned char) image->pixels[row][col];
     // (void)image;
     // (void)row;
     // (void)col;
