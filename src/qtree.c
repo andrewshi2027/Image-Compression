@@ -8,7 +8,7 @@ double calculate_average(int** pixels, int width, int height) {
     //Calculate sum of intensities
     for (int i = 0; i < height; i++) {
         for (int j = 0; i < width; j++)
-            intensity_sum = pixels[i][j];
+            intensity_sum += pixels[i][j];
     }
 
     //Average of intensities
