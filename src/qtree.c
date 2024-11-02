@@ -201,18 +201,18 @@ void save_qtree_as_ppm(QTNode *root, char *filename) {
 QTNode *load_preorder_helper(FILE *fp) {
     //Variables
     char node_type;
-    int intensity, row_start, column_start, width, height;
+    int average_intensity, row_start, column_start, width, height;
 
     //Read Data
-    fscanf(fp, "%c %d %d %d %d %d\n", &node_type, &intensity, &row_start, &width, &column_start, &height);
+    fscanf(fp, "%c %d %d %d %d %d\n", &node_type, &average_intensity, &row_start, &width, &column_start, &height);
 
     //Initialize and assign values to node
     QTNode *node = (QTNode *)malloc(sizeof(QTNode));
-    node->intensity = (unsigned char) intensity;
+    node->intensity = (unsigned char)average_intensity;
     node->row_start = row_start;
-    node->column_start = column_start;
     node->row_end = row_start + height;
-    node->column_start = column_start + width;
+    node->column_start = column_start;
+    node->column_end = column_start + width;
 
     //Set Children to NULL
     node->child1 = NULL;
