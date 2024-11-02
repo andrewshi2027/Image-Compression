@@ -4,12 +4,13 @@
 double calculate_average(int** pixels, int row_start, int row_end, int column_start, int column_end) {
 
     //Variables
-    double intensity_sum, average = 0.0;
+    double intensity_sum = 0.0;
+    double average = 0.0;
     double pixel_count = (column_end - column_start) * (row_end - row_start);
 
     //Calculate sum of intensities
     for (int i = row_start; i < row_end; i++) {
-        for (int j = column_start; i < column_end; j++)
+        for (int j = column_start; j < column_end; j++)
             intensity_sum += pixels[i][j];
     }
 
@@ -43,6 +44,12 @@ QTNode *quadtree_helper(Image *image, double max_rmse, int row_start, int row_en
         return NULL;
     }
 
+    //Set Children to NULL
+    node->child1 = NULL;
+    node->child2 = NULL;
+    node->child3 = NULL;
+    node->child4 = NULL;
+
     node->row_start = row_start;
     node->row_end = row_end;
     node->column_start = column_start;
@@ -59,18 +66,22 @@ QTNode *quadtree_helper(Image *image, double max_rmse, int row_start, int row_en
 
     //Split Node
     if (rmse > max_rmse) {
-        int row_mid = (row_start + height) / 2;
-        int column_mid = (column_start + width) / 2;
+        int row_mid = row_start + (height / 2);
+        int column_mid = column_start + (width / 2);
 
         //Case 1: Single Row of Pixels, children 3 and 4 are NULL
         if (height == 1) {
             node->child1 = quadtree_helper(image, max_rmse, row_start, row_end, column_start, column_mid);
             node->child2 = quadtree_helper(image, max_rmse, row_start, row_end, column_mid , column_end);
+            node->child3 = NULL;
+            node->child4 = NULL;
         }
         //Case 2: Single Column of Pixels, children 2 and 4 are NULL
         else if (width == 1) {
             node->child1 = quadtree_helper(image, max_rmse, row_start, row_mid, column_start, column_end);
             node->child3 = quadtree_helper(image, max_rmse, row_mid, row_end, column_start, column_end);
+            node->child2 = NULL;
+            node->child4 = NULL;
         }
         //Case 3: Split into 4 Quadrants
         else {
