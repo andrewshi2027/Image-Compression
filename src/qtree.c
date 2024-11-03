@@ -285,9 +285,9 @@ void save_preorder_helper(QTNode *root, FILE *fp) {
         node_type = 'N';
         fprintf(fp, "%c %d %d %d %d %d\n", node_type, average_intensity, row_start, height, column_start, width);
         save_preorder_helper(root->child1, fp);
-        save_preorder_helper(root->child1, fp);
-        save_preorder_helper(root->child1, fp);
-        save_preorder_helper(root->child1, fp);
+        save_preorder_helper(root->child2, fp);
+        save_preorder_helper(root->child3, fp);
+        save_preorder_helper(root->child4, fp);
     }
 }
 
