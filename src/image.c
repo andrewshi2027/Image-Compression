@@ -121,7 +121,11 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
     unsigned int height = image->height;
     unsigned int total_pixels = image->width * image->height;
     unsigned int message_length = strlen(message);
-
+    unsigned int printable_count = message_length;
+    
+    if (message_length * 8 > total_pixels) {
+        printable_count = total_pixels / 8;
+    }
 
     //Move intensities from 2D Array to 1D Array
     unsigned int pixels[total_pixels];
@@ -183,7 +187,7 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
 
     fclose(fp);
     delete_image(image);
-    return message_length;
+    return printable_count;
 
     // (void)message;
     // (void)input_filename;
