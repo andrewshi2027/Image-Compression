@@ -111,15 +111,80 @@ unsigned char get_image_intensity(Image *image, unsigned int row, unsigned int c
 }
 
 unsigned int hide_message(char *message, char *input_filename, char *output_filename) {
-    (void)message;
-    (void)input_filename;
-    (void)output_filename;
-    return 0;
+    Image *image = load_image(input_filename);
+    if (!image) {
+        return 0;
+    }
+
+    //Variables
+    unsigned int message_length = strlen(message);
+    unsigned int total_pixels = image->width * image->height;
+    unsigned int max_chars = total_pixels / 8;
+
+    if (message_length >= max_chars) {
+        message_length = max_chars - 1;
+    }
+
+    //Track the current character of the message
+    unsigned int char_index = 0;
+
+    //Encode each character in the image
+    for (unsigned int i = 0; i < message_length; i++) {
+        char current_char = message[i];
+        for (int bit = 7; bit >= 0; bit--) {
+
+            unsigned int pixel_index = char_index * 8 + (7 - bit);
+            int row = pixel_index / image->width;
+            int column = pixel_index % image->width;
+
+            //Clear LSB
+            image->pixels[row][column] &= ~1;
+            //Set LSB based on character's bit
+            image->pixels[row][column] |= (current_char >> bit) & 1; 
+        }
+        char_index++;
+    }
+
+    //Encode null terminator to signal end of message
+    for (int bit = 7; bit >= 0; bit--) {
+        unsigned int pixel_index = char_index * 8 + (7 - bit);
+        int row = pixel_index / image->width;
+        int column = pixel_index % image->width;
+
+        //Set LSB based on null terminator
+        image->pixels[row][column] &= ~1;
+    }
+
+    //Save the modified image
+    FILE *fp = fopen(output_filename, "w");
+    if(!fp) {
+        delete_image(image);
+        return 0;
+    }
+
+    //Write PPM header
+    fprintf(fp, "%s\n%d %d\n%d\n", image->header, image->width, image->height, image->max_intensity);
+
+    //Write Pixel Data
+    for (unsigned int i = 0; i < image->height; i++) {
+        for (unsigned int j = 0; i < image->width; j++) {
+            fprintf(fp, "%d ", image->pixels[i][j]);
+        }
+    }
+
+    fclose(fp);
+    delete_image(image);
+    return message_length;
+
+    // (void)message;
+    // (void)input_filename;
+    // (void)output_filename;
+    // return 0;
 }
 
 char *reveal_message(char *input_filename) {
-    (void)input_filename;
-    return NULL;
+    // (void)input_filename;
+    // return NULL;
 }
 
 unsigned int hide_image(char *secret_image_filename, char *input_filename, char *output_filename) {
