@@ -252,6 +252,7 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
     Image *secret_image = load_image(secret_image_filename);
     Image *image = load_image(input_filename);
 
+    //Variables
     unsigned int secret_width = secret_image->width;
     unsigned int secret_height = secret_image->height;
     unsigned int image_width = image->width;
@@ -267,30 +268,46 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
 
     int pixel_index = 0;
 
-    //Encode Secret Width and Height
-    for (int bit = 7; bit >= 0; bit--) {
-        image->pixels[0][pixel_index] &= ~1;
-        image->pixels[0][pixel_index] |= (secret_width >> bit) & 1;
-        pixel_index++;
+
+    //2D Array to 1D Array (secret_image)
+    char secret_pixels[secret_width * secret_height];
+    int secret_index = 0;
+    for (unsigned int i = 0; i < secret_height; i++) {
+        for (unsigned int j = 0; j < secret_width; j++) {
+            secret_pixels[secret_index] = secret_image->pixels[i][j];
+        }
     }
 
+    //2D Array to 1D Array (image)
+    char image_pixels[image_width * image_height];
+    int image_index = 0;
+    for (unsigned int i = 0; i < image_height; i++) {
+        for (unsigned int j = 0; j < image_width; j++) {
+            image_pixels[image_index] = image->pixels[i][j];
+        }
+    }
+
+    //Encode Secret Width and Height
+    //Width
     for (int bit = 7; bit >= 0; bit--) {
-        image->pixels[0][pixel_index] &= ~1;
-        image->pixels[0][pixel_index] |= (secret_height >> bit) & 1;
-        pixel_index++;
+        image_pixels[pixel_index] &= ~1;
+        image_pixels[pixel_index] |= (secret_width >> bit) & 1;
+    }
+    //Height
+    for (int bit = 7; bit >= 0; bit--) {
+        image_pixels[pixel_index] &= ~1;
+        image_pixels[pixel_index] |= (secret_height >> bit) & 1;
     }
 
     //Encode Secret Image Pixels
-    for (unsigned int i = 0; i < secret_height; i++) {
-        for (unsigned int j = 0; i < secret_width; j++) {
-            char pixel = (char)secret_image->pixels[i][j];
-            for (int bit = 7; bit >= 0; bit--) {
-                image->pixels[0][pixel_index] &= ~1;
-                image->pixels[0][pixel_index] |= (pixel >> bit) & 1;
-                pixel_index++;
-            }
+    for (unsigned int i = 0; i < secret_width * secret_height; i++) {
+        for (int bit = 7; bit >= 0; bit--) {
+            image_pixels[pixel_index] &= ~1;
+            image_pixels[pixel_index] |= (secret_pixels[i] >> bit) & 1;
+            pixel_index++;
         }
     }
+    
 
     FILE *fp = fopen(output_filename, "w");
     fprintf(fp, "%s\n%d %d\n%d\n", "P3", image_width, image_height, 255);
@@ -303,7 +320,7 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
     fclose(fp);
     delete_image(secret_image);
     delete_image(secret_image);
-    return 10;
+    return 1;
 
     // (void)secret_image_filename;
     // (void)input_filename;
