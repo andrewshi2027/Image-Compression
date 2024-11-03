@@ -172,12 +172,12 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
     }
 
     //Write PPM header
-    fprintf(fp, "%s\n%d %d\n%d\n", image->header, image->width, image->height, image->max_intensity);
+    fprintf(fp, "%s\n%d %d\n%d\n", "P3", image->width, image->height, image->max_intensity);
 
-    //Write Pixel Data
-    for (unsigned int i = 0; i < image->height; i++) {
-        for (unsigned int j = 0; j < image->width; j++) {
-            fprintf(fp, "%d ", image->pixels[i][j]);
+    //Write RGB to PPM File
+    for (unsigned int i = 0; i < height; i++) {
+        for (unsigned int j = 0; j < width; j++) {
+            fprintf(fp, "%d %d %d ", image->pixels[i][j], image->pixels[i][j], image->pixels[i][j]);
         }
     }
 
