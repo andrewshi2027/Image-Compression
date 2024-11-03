@@ -117,44 +117,51 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
     }
 
     //Variables
-    unsigned int message_length = strlen(message);
+    unsigned int width = image->width;
+    unsigned int height = image->height;
     unsigned int total_pixels = image->width * image->height;
-    unsigned int max_chars = total_pixels / 8;
+    unsigned int message_length = strlen(message);
 
-    //If message_length exceeds the capacity
-    if (message_length >= max_chars) {
-        message_length = max_chars - 1;
-    }
 
-    //Track the current character of the message
-    unsigned int message_index = 0;
-
-    //Each characters in the message
-    for (unsigned int i = 0; i < message_length; i++) {
-        char current_char = message[i];
-        //Each bit in the character
-        for (int bit = 7; bit >= 0; bit--) {
-
-            unsigned int pixel_index = message_index * 8 + (7 - bit);
-            int row = pixel_index / image->width;
-            int column = pixel_index % image->width;
-
-            //Clear LSB
-            image->pixels[row][column] &= ~1;
-            //Set LSB based on character's bit
-            image->pixels[row][column] |= (current_char >> bit) & 1; 
+    //Move intensities from 2D Array to 1D Array
+    unsigned int pixels[total_pixels];
+    int index = 0;
+    for (unsigned int i = 0; i < height; i++) {
+        for (unsigned int j = 0; j < width; j++) {
+            pixels[index++] = image->pixels[i][j];
         }
-        message_index++;
     }
 
-    //Encode null terminator to signal end of message
-    for (int bit = 7; bit >= 0; bit--) {
-        unsigned int pixel_index = message_index * 8 + (7 - bit);
-        int row = pixel_index / image->width;
-        int column = pixel_index % image->width;
+    //Encode each character into the pixels array
+    unsigned int pixel_index = 0;
+    for (unsigned int i = 0; i < message_length && pixel_index + 8 < total_pixels; i++) {
+        unsigned char current_char = message[i];
+        for (int bit = 7; bit >= 0; bit--) {
+            unsigned current_bit = (current_char >> bit) & 1;
 
-        //Set LSB based on null terminator
-        image->pixels[row][column] &= ~1;
+            //Clear the LSB of the current pixel
+            pixels[pixel_index] &= ~1;
+
+            //Set the LSB to the current bit
+            pixels[pixel_index] |= current_bit;
+            pixel_index++;
+        }
+    }
+
+    //Encode Null Terminator
+    if (pixel_index + 8 <= total_pixels){
+        for (int bit = 7; bit >= 0; bit--) {
+            pixels[pixel_index] &= ~1;
+            pixel_index++;
+        }
+    }
+
+    //Put 1D Array back into 2D Array
+    index = 0;
+    for (unsigned int i = 0; i < height; i++) {
+        for (unsigned int j = 0; j < width; j++) {
+            image->pixels[i][j] = pixels[index++];
+        }
     }
 
     //Save the modified image
