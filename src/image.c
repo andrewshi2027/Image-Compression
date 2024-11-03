@@ -111,68 +111,68 @@ unsigned char get_image_intensity(Image *image, unsigned int row, unsigned int c
 }
 
 unsigned int hide_message(char *message, char *input_filename, char *output_filename) {
-    // Image *image = load_image(input_filename);
-    // if (!image) {
-    //     return 0;
-    // }
+    Image *image = load_image(input_filename);
+    if (!image) {
+        return 0;
+    }
 
-    // //Variables
-    // unsigned int message_length = strlen(message);
-    // unsigned int total_pixels = image->width * image->height;
-    // unsigned int max_chars = total_pixels / 8;
+    //Variables
+    unsigned int message_length = strlen(message);
+    unsigned int total_pixels = image->width * image->height;
+    unsigned int max_chars = total_pixels / 8;
 
-    // //If message_length exceeds the capacity
-    // if (message_length >= max_chars) {
-    //     message_length = max_chars - 1;
-    // }
+    //If message_length exceeds the capacity
+    if (message_length >= max_chars) {
+        message_length = max_chars - 1;
+    }
 
-    // //Track the current character of the message
-    // unsigned int message_index = 0;
+    //Track the current character of the message
+    unsigned int message_index = 0;
 
-    // //Each characters in the message
-    // for (unsigned int i = 0; i < message_length; i++) {
-    //     char current_char = message[i];
-    //     //Each bit in the character
-    //     for (int bit = 7; bit >= 0; bit--) {
+    //Each characters in the message
+    for (unsigned int i = 0; i < message_length; i++) {
+        char current_char = message[i];
+        //Each bit in the character
+        for (int bit = 7; bit >= 0; bit--) {
 
-    //         unsigned int pixel_index = message_index * 8 + (7 - bit);
-    //         int row = pixel_index / image->width;
-    //         int column = pixel_index % image->width;
+            unsigned int pixel_index = message_index * 8 + (7 - bit);
+            int row = pixel_index / image->width;
+            int column = pixel_index % image->width;
 
-    //         //Clear LSB
-    //         image->pixels[row][column] &= ~1;
-    //         //Set LSB based on character's bit
-    //         image->pixels[row][column] |= (current_char >> bit) & 1; 
-    //     }
-    //     message_index++;
-    // }
+            //Clear LSB
+            image->pixels[row][column] &= ~1;
+            //Set LSB based on character's bit
+            image->pixels[row][column] |= (current_char >> bit) & 1; 
+        }
+        message_index++;
+    }
 
-    // //Encode null terminator to signal end of message
-    // for (int bit = 7; bit >= 0; bit--) {
-    //     unsigned int pixel_index = message_index * 8 + (7 - bit);
-    //     int row = pixel_index / image->width;
-    //     int column = pixel_index % image->width;
+    //Encode null terminator to signal end of message
+    for (int bit = 7; bit >= 0; bit--) {
+        unsigned int pixel_index = message_index * 8 + (7 - bit);
+        int row = pixel_index / image->width;
+        int column = pixel_index % image->width;
 
-    //     //Set LSB based on null terminator
-    //     image->pixels[row][column] &= ~1;
-    // }
+        //Set LSB based on null terminator
+        image->pixels[row][column] &= ~1;
+    }
 
-    // //Save the modified image
-    // FILE *fp = fopen(output_filename, "w");
-    // if(!fp) {
-    //     delete_image(image);
-    //     return 0;
-    // }
+    //Save the modified image
+    FILE *fp = fopen(output_filename, "w");
+    if(!fp) {
+        delete_image(image);
+        return 0;
+    }
 
-    // //Write PPM header
-    // fprintf(fp, "%s\n%d %d\n%d\n", image->header, image->width, image->height, image->max_intensity);
+    //Write PPM header
+    fprintf(fp, "%s\n%d %d\n%d\n", image->header, image->width, image->height, image->max_intensity);
 
-    // //Write Pixel Data
-    // for (unsigned int i = 0; i < image->height; i++) {
-    //     for (unsigned int j = 0; j < image->width; j++) {
-    //         fprintf(fp, "%d ", image->pixels[i][j]);
-    //     }
-    // }
+    //Write Pixel Data
+    for (unsigned int i = 0; i < image->height; i++) {
+        for (unsigned int j = 0; j < image->width; j++) {
+            fprintf(fp, "%d ", image->pixels[i][j]);
+        }
+    }
 
     // fclose(fp);
     // delete_image(image);
