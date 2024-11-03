@@ -260,7 +260,40 @@ QTNode *load_preorder_qt(char *filename) {
 
 //Saves the preorder traversal of the quadtree rooted at root using the preorder traversal encoding scheme described above.
 void save_preorder_qt(QTNode *root, char *filename) {
-    (void)root;
-    (void)filename;
+    FILE *fp = fopen(filename, "w");
+
+    if(!fp) {
+        return NULL;
+    }
+
+    //Variables
+    char node_type;
+    int average_intensity, row_start, row_end, column_end, column_start, width, height;
+
+    if(root) {
+        average_intensity = root->intensity;
+        row_start = root->row_start;
+        row_end = root->row_end;
+        column_start = root->column_start;
+        column_end = root->column_end;
+        width = column_end - column_start;
+        height = row_end - row_start;
+
+        //Leaf Node
+        if (!root->child1 && !root->child2 && !root->child3 && !root->child4) {
+            node_type = 'L';
+            fprintf(fp, "%c %d %d %d %d %d\n", node_type, average_intensity, row_start, height, column_start, width);
+        }
+        //Internal Node
+        else {
+            node_type = 'N';
+            fprintf(fp, "%c %d %d %d %d %d\n", node_type, average_intensity, row_start, height, column_start, width);
+        }
+
+    }
+
+    fclose(fp);
+    // (void)root;
+    // (void)filename;
 }
 
