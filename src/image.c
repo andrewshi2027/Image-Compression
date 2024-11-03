@@ -129,7 +129,7 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
         printable_count = message_length;
     }
     else {
-        printable_count = max_chars;
+        printable_count = max_chars - 1;
     }
 
     //Move intensities from 2D Array to 1D Array
@@ -143,7 +143,7 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
 
     //Encode each character into the pixels array
     unsigned int pixel_index = 0;
-    for (unsigned int i = 0; i < printable_count; i++) {
+    for (unsigned int i = 0; i < message_length && pixel_index + 8 < total_pixels; i++) {
         unsigned char current_char = message[i];
         for (int bit = 7; bit >= 0; bit--) {
             unsigned current_bit = (current_char >> bit) & 1;
