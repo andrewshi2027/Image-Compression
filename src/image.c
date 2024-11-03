@@ -234,6 +234,11 @@ char *reveal_message(char *input_filename) {
         }
 
         message[message_index++] = character;
+
+        if (character == '\0') {
+            delete_image(image);
+            return message;
+        }
     }
 
     delete_image(image);
