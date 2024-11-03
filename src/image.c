@@ -187,7 +187,8 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
 
     fclose(fp);
     delete_image(image);
-    return printable_count;
+    //Don't include null
+    return printable_count - 1;
 
     // (void)message;
     // (void)input_filename;
