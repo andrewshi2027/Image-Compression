@@ -258,7 +258,7 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
     unsigned int image_width = image->width;
     unsigned int image_height = image->height;
 
-    unsigned int total_pixels = (secret_width * 8) + (secret_height + 16);
+    unsigned int total_pixels = (secret_width * 8) * secret_height + 16;
 
     if (total_pixels > image_width * image_height) {
         delete_image(secret_image);
@@ -268,13 +268,12 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
 
     int pixel_index = 0;
 
-
     //2D Array to 1D Array (secret_image)
     char secret_pixels[secret_width * secret_height];
     int secret_index = 0;
     for (unsigned int i = 0; i < secret_height; i++) {
         for (unsigned int j = 0; j < secret_width; j++) {
-            secret_pixels[secret_index] = secret_image->pixels[i][j];
+            secret_pixels[secret_index++] = secret_image->pixels[i][j];
         }
     }
 
@@ -283,7 +282,7 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
     int image_index = 0;
     for (unsigned int i = 0; i < image_height; i++) {
         for (unsigned int j = 0; j < image_width; j++) {
-            image_pixels[image_index] = image->pixels[i][j];
+            image_pixels[image_index++] = image->pixels[i][j];
         }
     }
 
@@ -292,11 +291,13 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
     for (int bit = 7; bit >= 0; bit--) {
         image_pixels[pixel_index] &= ~1;
         image_pixels[pixel_index] |= (secret_width >> bit) & 1;
+        pixel_index++;
     }
     //Height
     for (int bit = 7; bit >= 0; bit--) {
         image_pixels[pixel_index] &= ~1;
         image_pixels[pixel_index] |= (secret_height >> bit) & 1;
+        pixel_index++;
     }
 
     //Encode Secret Image Pixels
@@ -308,7 +309,6 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
         }
     }
     
-
     FILE *fp = fopen(output_filename, "w");
     fprintf(fp, "%s\n%d %d\n%d\n", "P3", image_width, image_height, 255);
     for (unsigned int i = 0; i < image_height; i++) {
