@@ -258,7 +258,9 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
     unsigned int image_width = image->width;
     unsigned int image_height = image->height;
 
-    unsigned int total_pixels = (secret_width * 8) * secret_height + 16;
+    unsigned int total_pixels = 16 + (8 * secret_width * secret_height);
+    unsigned int total_image_pixels = image_width * image_height;
+    unsigned int total_secret_pixels = secret_width * secret_height;
 
     if (total_pixels > image_width * image_height) {
         delete_image(secret_image);
@@ -266,25 +268,24 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
         return 0;
     }
 
-    int pixel_index = 0;
-
     //2D Array to 1D Array (secret_image)
-    char secret_pixels[secret_width * secret_height];
+    char secret_pixels[total_secret_pixels];
     int secret_index = 0;
     for (unsigned int i = 0; i < secret_height; i++) {
         for (unsigned int j = 0; j < secret_width; j++) {
             secret_pixels[secret_index++] = secret_image->pixels[i][j];
         }
     }
-
     //2D Array to 1D Array (image)
-    char image_pixels[image_width * image_height];
+    char image_pixels[total_image_pixels];
     int image_index = 0;
     for (unsigned int i = 0; i < image_height; i++) {
         for (unsigned int j = 0; j < image_width; j++) {
             image_pixels[image_index++] = image->pixels[i][j];
         }
     }
+
+    int pixel_index = 0;
 
     //Encode Secret Width and Height
     //Width
@@ -311,15 +312,13 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
     
     FILE *fp = fopen(output_filename, "w");
     fprintf(fp, "%s\n%d %d\n%d\n", "P3", image_width, image_height, 255);
-    for (unsigned int i = 0; i < image_height; i++) {
-        for (unsigned int j = 0; j < image_width; j++) {
-            fprintf(fp, "%d %d %d ", image->pixels[i][j], image->pixels[i][j], image->pixels[i][j]);
-        }
+    for (unsigned int i = 0; i < total_image_pixels; i++) {
+        fprintf(fp, "%d %d %d ", image_pixels[i], image_pixels[i], image_pixels[i]);
     }
 
     fclose(fp);
     delete_image(secret_image);
-    delete_image(secret_image);
+    delete_image(image);
     return 1;
 
     // (void)secret_image_filename;
