@@ -249,10 +249,66 @@ char *reveal_message(char *input_filename) {
 }
 
 unsigned int hide_image(char *secret_image_filename, char *input_filename, char *output_filename) {
-    (void)secret_image_filename;
-    (void)input_filename;
-    (void)output_filename;
+    Image *secret_image = load_image(secret_image_filename);
+    Image *image = load_image(input_filename);
+
+    unsigned int secret_width = secret_image->width;
+    unsigned int secret_height = secret_image->height;
+    unsigned int image_width = image->width;
+    unsigned int image_height = image->height;
+
+    unsigned int total_pixels = (secret_width * 8) + (secret_height + 16);
+
+    if (total_pixels > image_width * image_height) {
+        delete_image(secret_image);
+        delete_image(image);
+        return 0;
+    }
+
+    int pixel_index = 0;
+
+    //Encode Secret Width and Height
+    for (int bit = 7; bit >= 0; bit--) {
+        image->pixels[0][pixel_index] &= ~1;
+        image->pixels[0][pixel_index] |= (secret_width >> bit) & 1;
+        pixel_index++;
+    }
+
+    for (int bit = 7; bit >= 0; bit--) {
+        image->pixels[0][pixel_index] &= ~1;
+        image->pixels[0][pixel_index] |= (secret_height >> bit) & 1;
+        pixel_index++;
+    }
+
+    //Encode Secret Image Pixels
+    for (unsigned int i = 0; i < secret_height; i++) {
+        for (unsigned int j = 0; i < secret_width; j++) {
+            char pixel = (char)secret_image->pixels[i][j];
+            for (int bit = 7; bit >= 0; bit--) {
+                image->pixels[0][pixel_index] &= ~1;
+                image->pixels[0][pixel_index] |= (pixel >> bit) & 1;
+                pixel_index++;
+            }
+        }
+    }
+
+    FILE *fp = fopen(output_filename, "w");
+    fprintf(fp, "%s\n%d %d\n%d\n", "P3", image_width, image_height, 255);
+    for (unsigned int i = 0; i < image_height; i++) {
+        for (unsigned int j = 0; j < image_width; j++) {
+            fprintf(fp, "%d %d %d ", image->pixels[i][j], image->pixels[i][j], image->pixels[i][j]);
+        }
+    }
+
+    fclose(fp);
+    delete_image(secret_image);
+    delete_image(secret_image);
     return 10;
+
+    // (void)secret_image_filename;
+    // (void)input_filename;
+    // (void)output_filename;
+    // return 10;
 }
 
 void reveal_image(char *input_filename, char *output_filename) {
