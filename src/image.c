@@ -202,8 +202,45 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
 }
 
 char *reveal_message(char *input_filename) {
-    (void)input_filename;
-    return NULL;
+    Image *image = load_image(input_filename);
+
+    unsigned int width = image->width;
+    unsigned int height = image->height;
+    unsigned int total_pixels = width * height;
+
+    char* message = (char *)malloc((total_pixels / 8) * sizeof(char));
+
+    //Move intensities from 2D Array to 1D Array
+    char pixels[total_pixels];
+    unsigned int index = 0;
+    for (unsigned int i = 0; i < height; i++) {
+        for (unsigned int j = 0; j < width; j++) {
+            pixels[index++] = (char) image->pixels[i][j];
+        }
+    }
+
+    unsigned message_index = 0;
+
+    index = 0;
+    while (index < total_pixels) {
+        char character = 0;
+
+        for (int bit = 7; bit >= 0; bit--) {
+            //LSB of Pixel
+            char char_bit = pixels[index] & 1;
+            //Set corresponding bit in character
+            character |= (char_bit << bit);
+            index++;
+        }
+
+        message[message_index++] = character;
+    }
+
+    delete_image(image);
+    return message;
+
+    // (void)input_filename;
+    // return NULL;
 }
 
 unsigned int hide_image(char *secret_image_filename, char *input_filename, char *output_filename) {
