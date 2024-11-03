@@ -174,14 +174,14 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
         }
     }
 
-    // fclose(fp);
-    // delete_image(image);
-    // return message_length;
+    fclose(fp);
+    delete_image(image);
+    return message_length;
 
-    (void)message;
-    (void)input_filename;
-    (void)output_filename;
-    return 0;
+    // (void)message;
+    // (void)input_filename;
+    // (void)output_filename;
+    // return 0;
 }
 
 char *reveal_message(char *input_filename) {
