@@ -121,19 +121,21 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
     unsigned int total_pixels = image->width * image->height;
     unsigned int max_chars = total_pixels / 8;
 
+    //If message_length exceeds the capacity
     if (message_length >= max_chars) {
         message_length = max_chars - 1;
     }
 
     //Track the current character of the message
-    unsigned int char_index = 0;
+    unsigned int message_index = 0;
 
-    //Encode each character in the image
+    //Each characters in the message
     for (unsigned int i = 0; i < message_length; i++) {
         char current_char = message[i];
+        //Each bit in the character
         for (int bit = 7; bit >= 0; bit--) {
 
-            unsigned int pixel_index = char_index * 8 + (7 - bit);
+            unsigned int pixel_index = message_index * 8 + (7 - bit);
             int row = pixel_index / image->width;
             int column = pixel_index % image->width;
 
@@ -142,12 +144,12 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
             //Set LSB based on character's bit
             image->pixels[row][column] |= (current_char >> bit) & 1; 
         }
-        char_index++;
+        message_index++;
     }
 
     //Encode null terminator to signal end of message
     for (int bit = 7; bit >= 0; bit--) {
-        unsigned int pixel_index = char_index * 8 + (7 - bit);
+        unsigned int pixel_index = message_index * 8 + (7 - bit);
         int row = pixel_index / image->width;
         int column = pixel_index % image->width;
 
@@ -167,7 +169,7 @@ unsigned int hide_message(char *message, char *input_filename, char *output_file
 
     //Write Pixel Data
     for (unsigned int i = 0; i < image->height; i++) {
-        for (unsigned int j = 0; i < image->width; j++) {
+        for (unsigned int j = 0; j < image->width; j++) {
             fprintf(fp, "%d ", image->pixels[i][j]);
         }
     }
