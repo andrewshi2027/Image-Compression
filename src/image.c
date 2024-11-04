@@ -354,7 +354,7 @@ void reveal_image(char *input_filename, char *output_filename) {
     height = 0;
     for (int bit = 7; bit >= 0; bit--) {
         char current_bit = pixels[index] & 1;
-        width |= current_bit << bit;
+        height |= current_bit << bit;
         index++;
     }
 
@@ -371,7 +371,7 @@ void reveal_image(char *input_filename, char *output_filename) {
     FILE *fp = fopen(output_filename, "w");
     fprintf(fp, "%s\n%d %d\n%d\n", "P3", width, height, 255);
     for (unsigned int i = 0; i < total_pixels; i++) {
-        fprintf(fp, "%d %d %d ", pixels[i], pixels[i], pixels[i]);
+        fprintf(fp, "%d %d %d ", secret_pixels[i], secret_pixels[i], secret_pixels[i]);
     }
 
     fclose(fp);
