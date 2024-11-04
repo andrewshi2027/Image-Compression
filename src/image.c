@@ -358,7 +358,7 @@ void reveal_image(char *input_filename, char *output_filename) {
         index++;
     }
 
-    char secret_pixels[width * height];
+    char *secret_pixels[width * height];
     for (unsigned int i = 0; i < width * height; i++) {
         char pixel_value;
         for (int bit = 7; bit >= 0; bit--) {
@@ -366,6 +366,7 @@ void reveal_image(char *input_filename, char *output_filename) {
             pixel_value |= bit_value << bit;
             index++; 
         }
+        secret_pixels[i] = pixel_value;
     }
 
     FILE *fp = fopen(output_filename, "w");
