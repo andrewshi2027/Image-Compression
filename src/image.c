@@ -328,6 +328,54 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
 }
 
 void reveal_image(char *input_filename, char *output_filename) {
-    (void)input_filename;
-    (void)output_filename;
+    Image *image = load_image(image);
+    unsigned int width = image->width;
+    unsigned int height = image->height;
+    unsigned int total_pixels = width * height;
+
+    //2D Array to 1D Array 
+    char pixels[total_pixels];
+    int index = 0;
+    for (unsigned int i = 0; i < height; i++) {
+        for (unsigned int j = 0; j < width; j++) {
+            pixels[index++] = image->pixels[i][j];
+        }
+    }
+
+    index = 0;
+
+    width = 0;
+    for (int bit = 7; bit >= 0; bit--) {
+        char current_bit = pixels[index] & 1;
+        width |= current_bit << bit;
+        index++;
+    }
+
+    height = 0;
+    for (int bit = 7; bit >= 0; bit--) {
+        char current_bit = pixels[index] & 1;
+        width |= current_bit << bit;
+        index++;
+    }
+
+    char secret_pixels[width * height];
+    for (unsigned int i = 0; i < width * height; i++) {
+        char pixel_value;
+        for (int bit = 7; bit >= 0; bit--) {
+            char bit_value = pixels[index] & 1;
+            pixel_value |= bit_value << bit;
+            index++; 
+        }
+    }
+
+    FILE *fp = fopen(output_filename, "w");
+    fprintf(fp, "%s\n%d %d\n%d\n", "P3", width, height, 255);
+    for (unsigned int i = 0; i < total_pixels; i++) {
+        fprintf(fp, "%d %d %d ", pixels[i], pixels[i], pixels[i]);
+    }
+
+    fclose(fp);
+    delete_image(image);
+    // (void)input_filename;
+    // (void)output_filename;
 }
