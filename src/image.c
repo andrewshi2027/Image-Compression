@@ -328,7 +328,7 @@ unsigned int hide_image(char *secret_image_filename, char *input_filename, char 
 }
 
 void reveal_image(char *input_filename, char *output_filename) {
-    Image *image = load_image(image);
+    Image *image = load_image(input_filename);
     unsigned int width = image->width;
     unsigned int height = image->height;
     unsigned int total_pixels = width * height;
